@@ -1,6 +1,6 @@
 # Neighbour Awareness Networking JavaScript API
 
-# Motivation
+## Motivation
 
 Neighbour Awareness Networking ("NAN" from here on), also known as Wi-Fi Aware, is a Wi-Fi standard that enables devices to discover and connect directly to each other without any other type of connectivity between them.
 
@@ -14,7 +14,7 @@ Neighbor Awareness Networking is available right now for some Android devices us
 
 Android API: https://developer.android.com/guide/topics/connectivity/wifi-aware
 
-# Use cases
+## Use cases
 
 + transfer large files easily and quickly
 + stream high quality media directly between nearby devices
@@ -25,7 +25,7 @@ Android API: https://developer.android.com/guide/topics/connectivity/wifi-aware
 + real-time collaboration with high bandwidth and low latency
 + simpler and more secure communication with IoT devices
 
-# Privacy and security
+## Privacy and security
 
 A naïve approach to the Web NAN API would be to replicate the existing low-level API, providing functionality to:
 
@@ -43,7 +43,7 @@ Second, service announcements can be trivially spoofed. In the case of Android, 
 
 Third, the existing APIs do not require much in terms of permissions. For example, the Android API only requires permission to obtain the coarse location and to view and change the WiFi state, and applications may carry out NAN operations in the background. For websites, this poses a risk that a website might be doing things behind your back, even when you are not currently using it.
 
-# Proposed solution
+## Proposed solution
 
 The challenge is to balance usefulness and user safety.
 
@@ -55,7 +55,7 @@ While this proposal relies on the exchange of user session IDs as a precondition
  - via a secure exchange with the server
  - via a physical tap of the devices, using NFC
 
-# API Overview
+## API Overview
 
 The read-only property `Navigator.nan` returns an object of type `NanManager` that is the main contact point with the NAN subsystem.
 
@@ -106,8 +106,8 @@ peer.requestConnection().then(
 
 After a connection has been established, `peer.baseUrl` will contain the base address of the peer (typically IPv6) which may then be used to exchange data.
 
-# API Example 1
+### API Example 1
 
-# API Example 2 (with NFC)
+### API Example 2 (with NFC)
 
-# Network-level implementation
+## Network-level implementation
