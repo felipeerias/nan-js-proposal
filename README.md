@@ -110,4 +110,127 @@ After a connection has been established, `peer.baseUrl` will contain the base ad
 
 ### API Example 2 (with NFC)
 
-## Network-level implementation
+## Notes about network-level implementation
+
+The purpose of this section is to show the feasibility of the proposed API by sketching a possible implementation.
+
+### Basics of NAN networking
+
+NAN devices discover each other and create clusters, which are then used to exchange service announcements and messages. Applications don't have any control over this clustering behaviour and are only notified when specific service publishers are found.
+
+Service advertisements in NAN contain the service name (255 bytes) and may contain an optional field with extra information (255 bytes).
+
+If additional security is needed, the specification recommends distributing a secret value among the nodes and using it to replace the service name.
+
+Short messages ("follow-up" in the specification) are 1-to-1 messages containing a payload of up to 255 bytes. Testing shows that they are exchanged at a rate of around 5-10 per second.
+
+Each discovery event or message received includes the MAC address of the originating peer. This MAC address will change periodically (every 30 minutes or so).
+
+In order to establish a connection, both peers need to request it to their operating systems specifying the role of the peer (initiator or responder) and the MAC address of the other peer.
+
+NAN connections use IPv6 link local addresses.
+
+## Draft implementation guidelines
+
+### Session values
+
+Each new NAN session begins by generating two random values: a `session ID` and a `session secret`.
+
++ the `session ID` will be used to identify the peer in service announcements
++ the `session secret` will be used to validate connection attempts
+
+### Service publishing
+
+User agents using the NAN JavaScript API will act as both publishers and subscribers.
+
+Only one active session will be advertised at any time. NAN publishing and discovery is paused when the website is in the background.
+
+Service announcements use a fixed service name, e.g. `"org.w3c.example.nan.id"`, and place in the extra info field a hash of their `session ID` and `session secret`.
+
+When the current session is paused or finished, the extra info field is cleared so other peers are notified that the session is no longer active; if no other sessions become active, NAN publishing stops altogether shortly afterwards.
+
+(Another option for the announcements would be to use the `session ID` as the service name, which would have the benefit that only peers that knew it beforehand would be able to discover the node.)
+
+### Discovery
+
+Each peer subscribes to the same service name, e.g. `"org.w3c.example.nan.id"`, and gets discovery events for each nearby peer advertising the same.
+
+Every time that a peer receives a new discovery event or the extra info field of a discovered peer changes, the User Agent will check the hash of its `session ID` and `session secret` with those that had been previously registered.
+
+Only if the hashes match, the User Agent will notify the calling application that a peer has been found.
+
+Publishing and discovery stop when a website is not in the foreground. When the website becomes active again, it will receive the notifications for the discovery events that happened while it was paused, if they are still valid.
+
+### Connection
+
+The implementation must cover two scenarios:
+
++ *symmetric*: both peers have each other's `session ID` and `session secret`
++ *asymmetric*: following a one-way exchange of `session ID` and `session secret` (e.g. via NFC)
+
+Connection requests are only possible between peers that have discovered each other. They follow this sequence:
+
++ initiator
+
+messages:
+-> MSG_REQUEST_HOST: MAC, my public, your secret ???
+-- decide whether the connection is accepted or not
+-- if accepted, request network to OS and send:
+<- RESPONSE_HOST_READY
+   so the other peer will create the network as well
+-- if rejected by the app, send:
+<- RESPONSE_HOST_REQUEST_REJECTED
+-- if error, too many connections, etc., send:
+<- RESPONSE_HOST_REQUEST_DROPPED
+-- when the connection has been established, both send:
+<> MSG_HELLO_NETWORK: IP address
+   so we can link NAN discovery and regular networking
+-- and when closing the connection, just in case
+<> MSG_BYE
+
+
+
+When another peer discovers the first one, and the ID matches, it must send the secret with a request to connect.
+
+Basically we are validating data exchange over two separate mediums: server/NFC/… and NAN.
+
+
+
+messages:
+-> MSG_REQUEST_HOST: MAC, my public, your secret ???
+-- decide whether the connection is accepted or not
+-- if accepted, request network to OS and send:
+<- RESPONSE_HOST_READY
+   so the other peer will create the network as well
+-- if rejected by the app, send:
+<- RESPONSE_HOST_REQUEST_REJECTED
+-- if error, too many connections, etc., send:
+<- RESPONSE_HOST_REQUEST_DROPPED
+-- when the connection has been established, both send:
+<> MSG_HELLO_NETWORK: IP address
+   so we can link NAN discovery and regular networking
+-- and when closing the connection, just in case
+<> MSG_BYE
+
+
+
+
+The Secure Service ID is formed by hashing the service name with the NAN Group Key. This new Service Id is then used for all Publish and Subscribe functions for the secure service discovery. Other devices in the same group will recognize the ID and process it correctly. 
+
+
+(Maybe we could have different services for each session and we subscribe to all the services for the people that we want to find?)
+SUBSCRIBE_TYPE_PASSIVE
+
+## After the connection is established
+
+The best option for communication once the connection is established is with WebRTC.
+
+However, the Android implementation uses scoped IPv6 addresses that are not currently supported by WebRTC.
+
+https://bugs.chromium.org/p/webrtc/issues/detail?id=9978
+https://bugzilla.mozilla.org/show_bug.cgi?id=1445771
+https://groups.google.com/forum/#!topic/discuss-webrtc/FlKQafa1Kfo
+
+
+
+
