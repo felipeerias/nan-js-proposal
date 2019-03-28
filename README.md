@@ -128,9 +128,7 @@ Each discovery event or message received includes the MAC address of the origina
 
 In order to establish a connection, both peers need to request it to their operating systems specifying the role of the peer (initiator or responder) and the MAC address of the other peer.
 
-NAN connections use IPv6 link local addresses.
-
-## Draft implementation guidelines
+NAN connections use IPv6 link local addresses, for example `fe80::5e:63ff:fefb:be0%aware_data0`.
 
 ### Session values
 
@@ -170,66 +168,24 @@ The implementation must cover two scenarios:
 
 Connection requests are only possible between peers that have discovered each other. They follow this sequence:
 
-+ initiator
++ *initiator* sends a `REQUEST` message that includes the `session secret` of both peers
++ *responder* validates the received secrets
++ if the secrets are invalid, the application rejects the connection, etc., *responder* sends `REQUEST_REJECTED`
++ if the connection is not possible (e.g. internal error, too many active connections, etc.), *responder* sends `REQUEST_DROPPED`
++ if the secrets are valid and the connection is possible, *responder* sends `REQUEST_ACCEPTED`
++ if the request has been accepted, each peer proceeds to create its end of the network
++ when the connection has been established, each peer sends a `HELLO` message containing its IP address
++ when a peer closes the connection, it sends a `BYE` message
 
-messages:
--> MSG_REQUEST_HOST: MAC, my public, your secret ???
--- decide whether the connection is accepted or not
--- if accepted, request network to OS and send:
-<- RESPONSE_HOST_READY
-   so the other peer will create the network as well
--- if rejected by the app, send:
-<- RESPONSE_HOST_REQUEST_REJECTED
--- if error, too many connections, etc., send:
-<- RESPONSE_HOST_REQUEST_DROPPED
--- when the connection has been established, both send:
-<> MSG_HELLO_NETWORK: IP address
-   so we can link NAN discovery and regular networking
--- and when closing the connection, just in case
-<> MSG_BYE
+### After the connection is established
 
+The standard option for P2P communication once the connection is established would be WebRTC.
 
+However, NAN uses scoped IPv6 addresses that are not currently supported by WebRTC. Relevant bugs and discussion:
 
-When another peer discovers the first one, and the ID matches, it must send the secret with a request to connect.
-
-Basically we are validating data exchange over two separate mediums: server/NFC/… and NAN.
-
-
-
-messages:
--> MSG_REQUEST_HOST: MAC, my public, your secret ???
--- decide whether the connection is accepted or not
--- if accepted, request network to OS and send:
-<- RESPONSE_HOST_READY
-   so the other peer will create the network as well
--- if rejected by the app, send:
-<- RESPONSE_HOST_REQUEST_REJECTED
--- if error, too many connections, etc., send:
-<- RESPONSE_HOST_REQUEST_DROPPED
--- when the connection has been established, both send:
-<> MSG_HELLO_NETWORK: IP address
-   so we can link NAN discovery and regular networking
--- and when closing the connection, just in case
-<> MSG_BYE
-
-
-
-
-The Secure Service ID is formed by hashing the service name with the NAN Group Key. This new Service Id is then used for all Publish and Subscribe functions for the secure service discovery. Other devices in the same group will recognize the ID and process it correctly. 
-
-
-(Maybe we could have different services for each session and we subscribe to all the services for the people that we want to find?)
-SUBSCRIBE_TYPE_PASSIVE
-
-## After the connection is established
-
-The best option for communication once the connection is established is with WebRTC.
-
-However, the Android implementation uses scoped IPv6 addresses that are not currently supported by WebRTC.
-
-https://bugs.chromium.org/p/webrtc/issues/detail?id=9978
-https://bugzilla.mozilla.org/show_bug.cgi?id=1445771
-https://groups.google.com/forum/#!topic/discuss-webrtc/FlKQafa1Kfo
++ https://bugs.chromium.org/p/webrtc/issues/detail?id=9978
++ https://bugzilla.mozilla.org/show_bug.cgi?id=1445771
++ https://groups.google.com/forum/#!topic/discuss-webrtc/FlKQafa1Kfo
 
 
 
