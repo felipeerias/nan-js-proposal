@@ -1,8 +1,18 @@
 # Neighbour Awareness Networking JavaScript API
 
+## Introduction
+
+Neighbour Awareness Networking (also known as Wi-Fi Aware) enables mobile devices to discover and connect to each other without requiring any other connectivity or infrastructure between them.
+
+Making this functionality available to websites would enable them to create fast and convenient connections between users who are physically close, opening up new ways of approaching the creation of Web solutions.
+
+However, this can not be done lightly: a careless use of this technology could pose severe threats to privacy and security.
+
+This document presents a draft proposal for a JavaScript API for Neighbour Awareness Networking that balances usefulness and user safety.
+
 ## Motivation
 
-Neighbour Awareness Networking ("NAN" from here on), also known as Wi-Fi Aware, is a Wi-Fi standard that enables devices to discover and connect directly to each other without any other type of connectivity between them.
+Neighbour Awareness Networking ("NAN" from here on), also known as Wi-Fi Aware, is an official Wi-Fi specification that enables devices to discover and connect directly to each other without any other type of connectivity between them.
 
 NAN works by forming clusters with neighboring devices, or by creating a new cluster if the device is the first one. This clustering behaviour happens at the OS level and applications have no control over it.
 
@@ -108,7 +118,20 @@ After a connection has been established, `peer.baseUrl` will contain the base ad
 
 ### API Example 1
 
++ Web chat with a friend
++ Website detects that friend is nearby
++ Extra funcionality is provided: send files, share camera, stream media…
+
 ### API Example 2 (with NFC)
+
++ *sender* and *receiver* open the website
++ *sender* selects the file to transfer
++ *sender* starts a NAN session
++ using NFC, *sender* transfers its `session ID` and `session secret` to *receiver*
++ *receiver* starts a NAN session, discovers *sender*, and connects to it
++ *sender* transfers the file to *receiver*
+
+[See this video of an Android app built using a similar approach](https://darker.ink/static/media/uploads/08_awarebeam_1.mp4)
 
 ## Notes about network-level implementation
 
@@ -187,6 +210,9 @@ However, NAN uses scoped IPv6 addresses that are not currently supported by WebR
 + https://bugzilla.mozilla.org/show_bug.cgi?id=1445771
 + https://groups.google.com/forum/#!topic/discuss-webrtc/FlKQafa1Kfo
 
+## Prototype
+
+In order to test and evolve this API, I have started planning a simple Android app with a WebView, a Wi-Fi Aware layer, and a custom JS interface between the two.
 
 
 
