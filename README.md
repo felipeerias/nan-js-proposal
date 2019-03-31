@@ -1,5 +1,7 @@
 # Neighbour Awareness Networking JavaScript API
 
+![NanJS logo](img/nanjs-logo.png)
+
 ## Summary
 
 Neighbour Awareness Networking (also known as Wi-Fi Aware) enables mobile devices to discover and connect to each other without requiring any other connectivity or infrastructure between them.
