@@ -1,6 +1,6 @@
 # Neighbour Awareness Networking JavaScript API
 
-## Introduction
+## Summary
 
 Neighbour Awareness Networking (also known as Wi-Fi Aware) enables mobile devices to discover and connect to each other without requiring any other connectivity or infrastructure between them.
 
@@ -8,9 +8,11 @@ Making this functionality available to websites would enable them to create fast
 
 However, this can not be done lightly: a careless use of this technology could pose severe threats to privacy and security.
 
-This document presents a draft proposal for a JavaScript API for Neighbour Awareness Networking that balances usefulness and user safety.
+This document presents a draft proposal for a JavaScript API for Neighbour Awareness Networking that balances usefulness and user safety. It achieves this by changing the conceptual model from that of the underlaying network technology: instead of discovering and being discovered by every other node nearby, applications would register their interest in individual user sessions and will only be able to discover and conect to those.
 
-## Motivation
+To sum it up, the goal of this Web API is to make it easy to discover and connect to people who have allowed you to do so, and only to them.
+
+## Introduction
 
 Neighbour Awareness Networking ("NAN" from here on), also known as Wi-Fi Aware, is an official Wi-Fi specification that enables devices to discover and connect directly to each other without any other type of connectivity between them.
 
@@ -33,6 +35,9 @@ Android API: https://developer.android.com/guide/topics/connectivity/wifi-aware
 + detect that two users are physically close to each other
 + improved privacy and security, as the data can remain local
 + real-time collaboration with high bandwidth and low latency
++ local gaming
++ explore large files/datasets with nearby colleagues without needing to upload and manage them in a server, making in-place collaboration more fluid
++ share information between a user's mobile and PC without needing a shared network infrastructure
 + simpler and more secure communication with IoT devices
 
 ## Privacy and security
@@ -59,11 +64,15 @@ The challenge is to balance usefulness and user safety.
 
 To do that, we must rethink how NAN is presented to the developer: instead of advertising and subscribing using services names, websites would discover and connect to specific user sessions.
 
-Upon starting NAN, the website would be assigned a unique session ID. It would receive the session IDs of other users, and would use *those* to discover and connect to other peers.
+Upon starting NAN, the website would be assigned a unique `sessionId` object. It would receive the session IDs of other users, and would use *those* to discover, validate and connect to other peers.
 
-While this proposal relies on the exchange of user session IDs as a precondition to discovery and connection, it does not mandate a particular mechanism to do so. Two possible options could be:
+Internally, the `sessionId` object contains a `public` field that will be used in NAN announcements and a `secret` field that will be used to validate connection requests.
+
+While this proposal relies on the exchange of these session IDs as a precondition to discovery and connection, it does not mandate a particular mechanism to do so. Two possible options could be:
  - via a secure exchange with the server
  - via a physical tap of the devices, using NFC
+
+Another aspect that is not (at the moment) covered by this proposal is peer authentication.
 
 ## API Overview
 
@@ -73,48 +82,48 @@ The caller must being by invoking the `attach()` method which, if successful, wi
 
 ```
 navigator.nan.attach()
-    .then((sessionId) => {
-        // NAN started
-        // sessionID is our identifier for this session
-    },
-    (reason) => {
-        // error while starting NAN
-    });
+  .then((sessionId) => {
+    // NAN started
+    // sessionID is our identifier for this session
+  },
+  (reason) => {
+    // error while starting NAN
+  });
 ```
 
 Invoking the `attach()` method may trigger a permission request to the user, display an ongoing notification, etc.
 
-Once NAN is started and we have received the session ID of the other user(s), we can subscribe to discovery events:
+Once NAN is started and we have received the `sessionId` of the other user(s), we can subscribe to discovery events:
 
 ```
 navigator.nan.ondiscovered = function(peer) {
-    // called when a peer has been discovered
+  // called when a peer has been discovered
 });
 
 navigator.nan.addPeerSessionId(peerSessionId);
 ```
 
-A discovery event will return a `Peer` object encapsulating the information about a single peer. We use this object to request a connection:
+A discovery event will return a `Peer` object encapsulating the information about a single peer. We may use this object to request a connection:
 
 ```
 navigator.nan.onconnected = function(peer) {
-    // called when a connection has been established
+  // called when a connection has been established
 });
 
 navigator.nan.ondisconnected = function(peer) {
-    // called when a connection has been interrupted
+  // called when a connection has been interrupted
 });
 
 peer.requestConnection().then(
-    (peer) => {
-        // connection established
-    },
-    (reason) => {
-        // failed to establish a connection
-    }
+  (peer) => {
+    // connection established
+  },
+  (reason) => {
+    // failed to establish a connection
+  }
 ```
 
-After a connection has been established, `peer.baseUrl` will contain the base address of the peer (typically IPv6) which may then be used to exchange data.
+After a connection has been established, `peer.baseUrl` will contain the base address of the peer, which may then be used to exchange data (the exact mechanism is outside the scope of this proposal).
 
 ### API Example 1
 
@@ -127,11 +136,11 @@ After a connection has been established, `peer.baseUrl` will contain the base ad
 + *sender* and *receiver* open the website
 + *sender* selects the file to transfer
 + *sender* starts a NAN session
-+ using NFC, *sender* transfers its `session ID` and `session secret` to *receiver*
++ using NFC, *sender* transfers its `sessionId.public` and `sessionId.secret` to *receiver*
 + *receiver* starts a NAN session, discovers *sender*, and connects to it
 + *sender* transfers the file to *receiver*
 
-[See this video of an Android app built using a similar approach](https://darker.ink/static/media/uploads/08_awarebeam_1.mp4)
+[See this video of an Android app](https://darker.ink/static/media/uploads/08_awarebeam_1.mp4) built using a similar approach.
 
 ## Notes about network-level implementation
 
@@ -155,10 +164,10 @@ NAN connections use IPv6 link local addresses, for example `fe80::5e:63ff:fefb:b
 
 ### Session values
 
-Each new NAN session begins by generating two random values: a `session ID` and a `session secret`.
+Each new NAN session generates a `sessionId`, containing two fields:
 
-+ the `session ID` will be used to identify the peer in service announcements
-+ the `session secret` will be used to validate connection attempts
++ `sessionId.public` will be used to identify the peer in service announcements
++ `sessionId.secret` will be used to validate connection attempts
 
 ### Service publishing
 
@@ -166,17 +175,17 @@ User agents using the NAN JavaScript API will act as both publishers and subscri
 
 Only one active session will be advertised at any time. NAN publishing and discovery is paused when the website is in the background.
 
-Service announcements use a fixed service name, e.g. `"org.w3c.example.nan.id"`, and place in the extra info field a hash of their `session ID` and `session secret`.
+Service announcements use a service name like e.g. `"org.w3c.example.nan.id"`, and place in the extra info field a hash of their `sessionId.public` and `sessionId.secret`.
 
 When the current session is paused or finished, the extra info field is cleared so other peers are notified that the session is no longer active; if no other sessions become active, NAN publishing stops altogether shortly afterwards.
 
-(Another option for the announcements would be to use the `session ID` as the service name, which would have the benefit that only peers that knew it beforehand would be able to discover the node.)
+(Another option for the announcements would be to use the `sessionId.public` as the service name, which would have the benefit that only peers that knew it beforehand would be able to discover the node.)
 
 ### Discovery
 
 Each peer subscribes to the same service name, e.g. `"org.w3c.example.nan.id"`, and gets discovery events for each nearby peer advertising the same.
 
-Every time that a peer receives a new discovery event or the extra info field of a discovered peer changes, the User Agent will check the hash of its `session ID` and `session secret` with those that had been previously registered.
+Every time that a peer receives a new discovery event or the extra info field of a discovered peer changes, the User Agent will get from the discovery information the hash of its `sessionId.public` and `sessionId.secret`, and will compare them with those that had been previously registered.
 
 Only if the hashes match, the User Agent will notify the calling application that a peer has been found.
 
@@ -186,12 +195,12 @@ Publishing and discovery stop when a website is not in the foreground. When the 
 
 The implementation must cover two scenarios:
 
-+ *symmetric*: both peers have each other's `session ID` and `session secret`
-+ *asymmetric*: following a one-way exchange of `session ID` and `session secret` (e.g. via NFC)
++ *symmetric*: both peers have each other's `sessionId.public` and `sessionId.secret`
++ *asymmetric*: following a one-way exchange of `sessionId.public` and `sessionId.secret` (e.g. via NFC)
 
 Connection requests are only possible between peers that have discovered each other. They follow this sequence:
 
-+ *initiator* sends a `REQUEST` message that includes the `session secret` of both peers
++ *initiator* sends a `REQUEST` message that includes the `sessionId.secret` of both peers
 + *responder* validates the received secrets
 + if the secrets are invalid, the application rejects the connection, etc., *responder* sends `REQUEST_REJECTED`
 + if the connection is not possible (e.g. internal error, too many active connections, etc.), *responder* sends `REQUEST_DROPPED`
@@ -209,10 +218,5 @@ However, NAN uses scoped IPv6 addresses that are not currently supported by WebR
 + https://bugs.chromium.org/p/webrtc/issues/detail?id=9978
 + https://bugzilla.mozilla.org/show_bug.cgi?id=1445771
 + https://groups.google.com/forum/#!topic/discuss-webrtc/FlKQafa1Kfo
-
-## Prototype
-
-In order to test and evolve this API, I have started planning a simple Android app with a WebView, a Wi-Fi Aware layer, and a custom JS interface between the two.
-
 
 
