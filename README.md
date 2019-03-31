@@ -52,7 +52,7 @@ A naïve approach to the Web NAN API would be to replicate the existing low-leve
 
 However, this naïve approach poses severe threats to privacy and security.
 
-First, the website would be notified of every nearby person who is using the same website, without asking their permission. This could lead to surveillance scenarios where websites detect and log everybody that is around the user.
+First, the user of the API would be notified of every nearby person who is using the same website, without asking their permission. This could lead to surveillance scenarios where websites detect and log everybody around the user.
 
 Second, service announcements can be trivially spoofed. In the case of Android, there isn't any check or guarantee on the service name that you are announcing. In a hypothetical scenario, a website could use NAN to advertise as *"com.facebook"* and get matches for people using Facebook in the vicinity.
 
@@ -64,9 +64,9 @@ The challenge is to balance usefulness and user safety.
 
 To do that, we must rethink how NAN is presented to the developer: instead of advertising and subscribing using services names, websites would discover and connect to specific user sessions.
 
-Upon starting NAN, the website would be assigned a unique `sessionId` object. It would receive the session IDs of other users, and would use *those* to discover, validate and connect to other peers.
+Upon starting NAN, the user of the API would be assigned a unique `sessionId` object, the exact contents of which will depend on the implementation.
 
-Internally, the `sessionId` object contains a `public` field that will be used in NAN announcements and a `secret` field that will be used to validate connection requests.
+It would receive the session IDs of other users, and would use *those* to discover, validate and connect to them.
 
 While this proposal relies on the exchange of these session IDs as a precondition to discovery and connection, it does not mandate a particular mechanism to do so. Two possible options could be:
  - via a secure exchange with the server
@@ -78,7 +78,7 @@ Another aspect that is not (at the moment) covered by this proposal is peer auth
 
 The read-only property `Navigator.nan` returns an object of type `NanManager` that is the main contact point with the NAN subsystem.
 
-The caller must being by invoking the `attach()` method which, if successful, will return the identifier for the current session.
+The user of the API must being by invoking the `attach()` method which, if successful, will return the identifier for the current session.
 
 ```
 navigator.nan.attach()
@@ -91,7 +91,7 @@ navigator.nan.attach()
   });
 ```
 
-Invoking the `attach()` method may trigger a permission request to the user, display an ongoing notification, etc.
+Invoking the `attach()` method may trigger a permission request dialog, display an ongoing notification, etc.
 
 Once NAN is started and we have received the `sessionId` of the other user(s), we can subscribe to discovery events:
 
@@ -152,7 +152,7 @@ NAN devices discover each other and create clusters, which are then used to exch
 
 Service advertisements in NAN contain the service name (255 bytes) and may contain an optional field with extra information (255 bytes).
 
-If additional security is needed, the specification recommends distributing a secret value among the nodes and using it to replace the service name.
+(If additional security is needed, the specification recommends distributing a secret value among the nodes and using it to replace the service name.)
 
 Short messages ("follow-up" in the specification) are 1-to-1 messages containing a payload of up to 255 bytes. Testing shows that they are exchanged at a rate of around 5-10 per second.
 
@@ -164,14 +164,16 @@ NAN connections use IPv6 link local addresses, for example `fe80::5e:63ff:fefb:b
 
 ### Session values
 
-Each new NAN session generates a `sessionId`, containing two fields:
+In this example implementation, each new NAN session generates a `sessionId`containing two internal fields:
 
-+ `sessionId.public` will be used to identify the peer in service announcements
++ `sessionId.public` will be used to identify the peer in NAN service announcements
 + `sessionId.secret` will be used to validate connection attempts
+
+This `sessionId` object may be serialised and de-serialised in order to be exchanged between peers.
 
 ### Service publishing
 
-User agents using the NAN JavaScript API will act as both publishers and subscribers.
+User Agents using the NAN JavaScript API will act as both publishers and subscribers.
 
 Only one active session will be advertised at any time. NAN publishing and discovery is paused when the website is in the background.
 
@@ -185,18 +187,18 @@ When the current session is paused or finished, the extra info field is cleared 
 
 Each peer subscribes to the same service name, e.g. `"org.w3c.example.nan.id"`, and gets discovery events for each nearby peer advertising the same.
 
-Every time that a peer receives a new discovery event or the extra info field of a discovered peer changes, the User Agent will get from the discovery information the hash of its `sessionId.public` and `sessionId.secret`, and will compare them with those that had been previously registered.
+Every time that the User Agent receives a new discovery event or the extra info field of a discovered peer changes, it will get compare the received discovery information with those that had been previously registered.
 
-Only if the hashes match, the User Agent will notify the calling application that a peer has been found.
+Only if the values match, the User Agent will notify the user that a peer has been found.
 
-Publishing and discovery stop when a website is not in the foreground. When the website becomes active again, it will receive the notifications for the discovery events that happened while it was paused, if they are still valid.
+Publishing and discovery stop when a website is not in the foreground.
 
 ### Connection
 
-The implementation must cover two scenarios:
+The implementation must consider two scenarios:
 
-+ *symmetric*: both peers have each other's `sessionId.public` and `sessionId.secret`
-+ *asymmetric*: following a one-way exchange of `sessionId.public` and `sessionId.secret` (e.g. via NFC)
++ *symmetric*: both peers have each other's `sessionId`
++ *asymmetric*: following a one-way exchange of `sessionId` from one peer to another, e.g. via NFC
 
 Connection requests are only possible between peers that have discovered each other. They follow this sequence:
 
