@@ -2,19 +2,50 @@
 
 ![NanJS logo](img/nanjs-logo.png)
 
+##### Table of Contents  
+
+* [Summary](#summary)
+* [Introduction to Neighbour Awareness Networking](#introduction-to-neighbour-awareness-networking)
+* [Use cases](#use-cases)
+* [Privacy and security](#privacy-and-security)
+* [Proposed solution](#proposed-solution)
+* [Implementation notes](#implementation-notes)
+
 ## Summary
 
-Neighbour Awareness Networking (also known as Wi-Fi Aware) enables mobile devices to discover and connect to each other without requiring any other connectivity or infrastructure between them.
+[Neighbour Awareness Networking](#introduction-to-neighbour-awareness-networking) ("NAN" from here on), also known as Wi-Fi Aware, is an official Wi-Fi specification that enables mobile devices to discover and connect directly to each other without requiring any other type of connectivity between them.
 
-Making this functionality available to websites would enable them to create fast and convenient connections between users who are physically close, opening up new ways of approaching the creation of Web solutions.
+Making this functionality available to websites would enable them to create fast and convenient connections between users who are physically close, opening up [new ways of approaching the creation of Web solutions](#use-cases).
 
-However, this can not be done lightly: a careless use of this technology would pose severe threats to privacy and security.
+However, this can not be done lightly: a careless use of this technology would pose severe [threats to privacy and security](#privacy-and-security).
 
-This document presents a draft proposal for a JavaScript API for Neighbour Awareness Networking that balances usefulness and user safety. It achieves this by changing the conceptual model from that of the underlaying network technology: instead of discovering and being discovered by every other node nearby, Web applications would register their interest in individual user sessions and will only be able to discover and conect to those.
+This document presents a draft proposal for [a JavaScript API for NAN](#proposed-solution) that balances usefulness and user safety. It achieves this by changing the conceptual model from that of the underlaying network technology: instead of discovering and being discovered by every other node nearby, Web applications would register their interest in individual user sessions and will only be able to discover and conect to those.
 
 The goal of this Web API is to make it easy to discover and connect to people who have allowed you to do so, and only to them.
 
-This document also discusses an example protocol at the network level: this protocol is intentionally kept simple, as its purpose is to show the feasibility of implementing the proposed Web API.
+This document also discusses [an example protocol at the network level](#implementation-notes): this protocol is intentionally kept simple, as its main purpose is to show the feasibility of implementing the proposed Web API.
+
+## Introduction to Neighbour Awareness Networking
+
+Neighbour Awareness Networking ("NAN" from here on), also known as Wi-Fi Aware, is an official Wi-Fi specification that enables mobile devices to discover and connect directly to each other without requiring any other type of connectivity between them.
+
+NAN works by forming clusters with neighboring devices, or by creating a new cluster if the device is the first one. This clustering behaviour happens automatically and applications have no control over it.
+
+Applications using NAN may publish one or more discoverable services and/or may subscribe to one or more of those services. Devices can be both publishers and subscribers at the same time.
+
+Service advertisements in NAN contain the service name (up to 255 bytes) and may contain an optional field with extra information (up to 255 bytes).
+
+A subscriber will be notified when a matching publisher has been discovered, at which point it may exchange short messages or establish a fast bi-directional network connection with the other device.
+
+Each discovery event or message received includes the MAC address of the originating peer. This MAC address will change periodically (every 30 minutes or so).
+
+Short messages ("follow-up" in the specification) are 1-to-1 messages containing a payload of up to 255 bytes. Testing shows that they are exchanged at a rate of around 5-10 per second.
+
+In order to establish a connection, both peers need to request it to their operating systems specifying the role of the peer (initiator or responder) and the MAC address of the other peer.
+
+NAN connections are one-to-one and devices are only able to establish a limited number of them at the same time. These connections use IPv6 link-local addresses, for example `fe80::5e:63ff:fefb:be0%aware_data0`.
+
+NAN is available right now for some [Android](https://developer.android.com/guide/topics/connectivity/wifi-aware) devices using Qualcomm chipsets (Pixel 2, Pixel 3, more coming in the near future). There are also implementations by companies like Intel, Broadcom and Marvell.
 
 ## Use cases
 
@@ -29,30 +60,6 @@ This document also discusses an example protocol at the network level: this prot
 + explore large files/datasets with nearby colleagues without needing to upload and manage them in a server, making in-place collaboration more fluid
 + share information between a user's mobile and PC without needing a shared network infrastructure
 + simpler and more secure communication with IoT devices
-
-## Introduction to Neighbour Awareness Networking
-
-Neighbour Awareness Networking ("NAN" from here on), also known as Wi-Fi Aware, is an official Wi-Fi specification that enables devices to discover and connect directly to each other without any other type of connectivity between them.
-
-NAN works by forming clusters with neighboring devices, or by creating a new cluster if the device is the first one. This clustering behaviour happens at the OS level and applications have no control over it.
-
-Applications using NAN may publish one or more discoverable services and/or may subscribe to one or more of those services. Devices can be both publishers and subscribers at the same time.
-
-Service advertisements in NAN contain the service name (255 bytes) and may contain an optional field with extra information (255 bytes).
-
-A subscriber will be notified when a matching publisher has been discovered, at which point it may exchange short messages or establish a fast bi-directional network connection with the other device.
-
-Each discovery event or message received includes the MAC address of the originating peer. This MAC address will change periodically (every 30 minutes or so).
-
-Short messages ("follow-up" in the specification) are 1-to-1 messages containing a payload of up to 255 bytes. Testing shows that they are exchanged at a rate of around 5-10 per second.
-
-In order to establish a connection, both peers need to request it to their operating systems specifying the role of the peer (initiator or responder) and the MAC address of the other peer.
-
-NAN connections use IPv6 link-local addresses, for example `fe80::5e:63ff:fefb:be0%aware_data0`.
-
-NAN is available right now for some Android devices using Qualcomm chipsets (Pixel 2 and Pixel 3, with more coming in the near future). There are also implementations by companies like Intel, Broadcom and Marvell.
-
-Android API: https://developer.android.com/guide/topics/connectivity/wifi-aware
 
 ## Privacy and security
 
@@ -156,27 +163,27 @@ After a connection has been established, `peer.baseUrl` will contain the base ad
 
 ### Draft API spec
 
-`NanManager`
+Interface `NanManager`:
 
 + `start()`: attach to the NAN service; returns a Promise that, when succesfully resolved, provides the `peerId` for this user session
 + `stop()`: ends the session and detaches the user from the NAN service (after calling this method, `peerId` will no longer be valid)
-+ `subscribeToPeer(peerId)`
-+ `unsubscribeFromPeer(peerId)`
-+ `getPeers()`
-+ `onPeerStateChanged(peer)`
-+ `onConnectionRequest(peer)`
-+ `acceptConnectionRequest(peer, isAccepted)`
++ `subscribeToPeer(peerId)`: adds the peer identified by the given ID to the list of subscribed peers
++ `unsubscribeFromPeer(peerId)`: removes the peer
++ `getPeers()`: returns the collection of subscribed peers
++ `onPeerStateChanged(peer)`: handler for when a peer's state has been updated
++ `onConnectionRequest(peer)`: handler for when a peer has requested a connection
++ `acceptConnectionRequest(peer, isAccepted)`: indicates that a pending connection request should be accepted
 
-`PeerId`
+Interface `PeerId`:
 
 + `toBytes()`
 + `fromBytes()`
 
-`NanPeer`
+Interface `NanPeer`:
 
-+ `state`: gone, discovered, connecting, connected
-+ `onStateChanged()`
-+ `unsuscribe()`
++ `state`: read-only property containing the peer's current state (gone, discovered, connecting, connected…)
++ `onStateChanged()`: handler for when the state changes
++ `unsuscribe()`: remove this peer from the list of subscribed peers
 
 ### Example 1
 
@@ -195,7 +202,7 @@ After a connection has been established, `peer.baseUrl` will contain the base ad
 
 [See this video of an Android app](https://darker.ink/static/media/uploads/08_awarebeam_1.mp4) built using a similar approach.
 
-## Notes about network-level implementation
+## Implementation notes
 
 The purpose of this section is to show the feasibility of the proposed API by sketching a possible protocol at the network level. Note that this protocol is just an example and is intentionally kept simple.
 
