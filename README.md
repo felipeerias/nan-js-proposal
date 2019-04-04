@@ -19,7 +19,7 @@ Making this functionality available to websites would enable them to create fast
 
 However, this can not be done lightly: a careless use of this technology would pose severe [threats to privacy and security](#privacy-and-security).
 
-This document presents a draft proposal for [a JavaScript API for NAN](#proposed-solution) that balances usefulness and user safety. It achieves this by changing the conceptual model from that of the underlaying network technology: instead of discovering and being discovered by every other node nearby, Web applications would register their interest in individual user sessions and will only be able to discover and conect to those.
+This document presents a draft proposal for [a JavaScript API for NAN](#proposed-solution) that balances usefulness and user safety. It achieves this by changing the conceptual model from that of the underlaying network technology: instead of discovering and being discovered by every other node nearby, Web applications would register their interest in individual user sessions and will only be able to discover and connect to those.
 
 The goal of this Web API is to make it easy to discover and connect to people who have allowed you to do so, and only to them.
 
@@ -49,17 +49,61 @@ NAN is available right now for some [Android](https://developer.android.com/guid
 
 ## Use cases
 
-+ transfer large files easily and quickly
-+ stream high quality media directly between nearby devices
-+ optimize Internet bandwidth usage
-+ exchange data with nearby people while not connected to the Internet or to other existing infrastructure
-+ detect that two users are physically close to each other
-+ improved privacy and security, as the data can remain local
-+ real-time collaboration with high bandwidth and low latency
-+ local gaming
-+ explore large files/datasets with nearby colleagues without needing to upload and manage them in a server, making in-place collaboration more fluid
-+ share information between a user's mobile and PC without needing a shared network infrastructure
-+ simpler and more secure communication with IoT devices
+Note that this list does not attempt to be exhaustive and that the prototypes shown here were built using the Android API (and are therefore a bit more flexible than what a website can do).
+
+### Fluid same-place collaboration
+
+NAN makes possible the flexible interconnection of digital devices, enabling fluid real-time collaboration with high bandwidth and low latency while improving privacy and security, as the data remains local to the users' devices.
+
+NAN can be used to reduce the amount of data that is exchanged over the Internet, optimizing bandwidth usage and providing more functionality when devices are offline.
+
+The videos below show an example application that lets users carry out collaborative presentations without relying on existing network infrastructure.
+
+* [VIDEO 1 - prototype using NFC to join a presentation, with live drawing](https://darker.ink/static/media/uploads/05_meshpresenter_1.mp4)
+* [VIDEO 2 - prototype sharing images between participants](https://darker.ink/static/media/uploads/06_meshpresenter_2.mp4)
+* [VIDEO 3 - prototype carrying out a poll](https://darker.ink/static/media/uploads/07_meshpresenter_3.mp4)
+
+### Fast transfer of files
+
+NAN connections enable fast and convenient transfer of files between nearby devices, without the data having to be uploaded and downloaded to/from a remote server. The examples below use NFC to exchange the device's information, which is then used to establish the connection and transfer the files.
+
+* [VIDEO 1 - prototype transfering between two devices (280 MB)](https://darker.ink/static/media/uploads/08_awarebeam_1.mp4)
+* [VIDEO 2 - prototype transfering from one device to another two (172 MB)](https://darker.ink/static/media/uploads/09_awarebeam_2.mp4)
+* [VIDEO 3 - prototype transfering multiple files](https://darker.ink/static/media/uploads/10_awarebeam_3.mp4)
+
+### Local gaming
+
+NAN connections may be used for local gaming in situations where Internet access is unavailable or restricted. In the example videos below, one device acts as the game server through two 1-to-1 connections with the others.
+
+* [VIDEO 1 - prototype playing OpenArena](https://darker.ink/static/media/uploads/02_openarena_1.mp4)
+* [VIDEO 2 - prototype playing OpenArena](https://darker.ink/static/media/uploads/03_openarena_2.mp4)
+
+### Media streaming
+
+NAN connections enable the streaming of HD media directly between nearby devices. Beyond the most obvious use cases (videocalls, etc.), the video below is a design exploration: a camera application that receives a stream of what your friends' cameras around you are pointing at, giving you different points of view of an event.
+
+* [VIDEO - collaborative camera](https://darker.ink/static/media/uploads/collaborativecameratest.mp4)
+
+### Proximity detection
+
+NAN discovery may be used by websites that want to trigger certain actions when two users are physically close to each other. For example, a chat website may detect that two users are close to each other and offer additional, NAN-based functionality. This can also be used as a complement to the Geolocation Web API.
+
+### IoT
+
+NAN may be used to connect and configure IoT devices without relaying on remote servers, improving privacy, flexibility, and trust.
+
+### Connect the user's devices
+
+NAN may be used to share information between a user's mobile and PC when they are close by, without relaying on an existing network infrastructure.
+
+### Read more
+
+* [“Mobile design with device-to-device networks”](https://darker.ink/blog/mobile-design-with-device-to-device-networks/) (blog)
+* [“Mobile design with device-to-device networks”](https://fosdem.org/2019/schedule/event/device_to_device_networks/) (FOSDEM)
+* [“P2P presentations”](https://darker.ink/blog/p2p-presentations/) (blog)
+* [“Emergent IoT configurations for same-place collaboration”](https://darker.ink/static/media/TP1_IDM_Felipe_Erias_FINAL.pdf) (PDF)
+* [RFC 7478: Web Real-Time Communication Use Cases and Requirements](https://tools.ietf.org/html/rfc7478)
+* [WebRTC Next Version Use Cases](https://www.w3.org/TR/webrtc-nv-use-cases/) (working draft)
 
 ## Privacy and security
 
@@ -182,25 +226,11 @@ Interface `PeerId`:
 Interface `NanPeer`:
 
 + `state`: read-only property containing the peer's current state (gone, discovered, connecting, connected…)
++ `baseUrl
 + `onStateChanged()`: handler for when the state changes
++ `requestConnection()`
++ `closeConnection()`
 + `unsuscribe()`: remove this peer from the list of subscribed peers
-
-### Example 1
-
-+ Web chat with a friend
-+ Website detects that friend is nearby
-+ Extra funcionality is provided: send files, share camera, stream media…
-
-### Example 2 (with NFC)
-
-+ *sender* and *receiver* open the website
-+ *sender* selects the file to transfer
-+ *sender* starts a NAN session
-+ using NFC, *sender* transfers its `sessionId.public` and `sessionId.secret` to *receiver*
-+ *receiver* starts a NAN session, discovers *sender*, and connects to it
-+ *sender* transfers the file to *receiver*
-
-[See this video of an Android app](https://darker.ink/static/media/uploads/08_awarebeam_1.mp4) built using a similar approach.
 
 ## Implementation notes
 
