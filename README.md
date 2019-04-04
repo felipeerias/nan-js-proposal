@@ -33,7 +33,7 @@ NAN works by forming clusters with neighboring devices, or by creating a new clu
 
 Applications using NAN may publish one or more discoverable services and/or may subscribe to one or more of those services. Devices can be both publishers and subscribers at the same time.
 
-Service advertisements in NAN contain the service name (up to 255 bytes) and may contain an optional field with extra information (up to 255 bytes).
+Service advertisements in NAN contain the service name (up to 255 bytes) and may contain an optional *extra info* field with additional information (up to 255 bytes).
 
 A subscriber will be notified when a matching publisher has been discovered, at which point it may exchange short messages or establish a fast bi-directional network connection with the other device.
 
@@ -251,17 +251,17 @@ User Agents using the NAN JavaScript API will act as both publishers and subscri
 
 Only one active session will be advertised at any time. NAN publishing and discovery is paused when the website is in the background.
 
-Service announcements use a service name like e.g. `"org.w3c.example.nan.id"`, and place in the extra info field a hash of their `sessionId.public` and `sessionId.secret`.
+Service announcements use a service name like e.g. `"org.w3c.example.nan.id"`, and place in the *extra info* field their `sessionId.public`.
 
-When the current session is paused or finished, the extra info field is cleared so other peers are notified that the session is no longer active; if no other sessions become active, NAN publishing stops altogether shortly afterwards.
+When the current session is paused or finished, the *extra info* field is cleared so other peers are notified that the session is no longer active; if no other sessions become active, NAN publishing stops altogether shortly afterwards.
 
-(Another option for the announcements would be to use the `sessionId.public` as the service name, which would have the benefit that only peers that knew it beforehand would be able to discover the node.)
+(Note: another option for the announcements would be to use the `sessionId.public` as the service name, which would have the benefit that only peers that knew it beforehand would be able to discover the node.)
 
 ### Discovery
 
-Each peer subscribes to the same service name, e.g. `"org.w3c.example.nan.id"`, and gets discovery events for each nearby peer advertising the same.
+Peers subscribe to the same service name, e.g. `"org.w3c.example.nan.id"`, and get discovery events for each nearby peer advertising the same.
 
-Every time that the User Agent receives a new discovery event or the extra info field of a discovered peer changes, it will get compare the received discovery information with those that had been previously registered.
+Every time that the User Agent receives a new discovery event or the *extra info* field of a discovered peer changes, it will compare the information in the *extra info* field with the `public` values that the user had previously subscribed to.
 
 Only if the values match, the User Agent will notify the user that a peer has been found.
 
@@ -278,18 +278,20 @@ Connection requests are only possible between peers that have discovered each ot
 
 + *initiator* sends a `REQUEST` message that includes the `sessionId.secret` of both peers
 + *responder* validates the received secrets
-+ if the secrets are invalid, the application rejects the connection, etc., *responder* sends `REQUEST_REJECTED`
-+ if the connection is not possible (e.g. internal error, too many active connections, etc.), *responder* sends `REQUEST_DROPPED`
++ if the secrets are invalid or the application rejects the connection, *responder* sends `REQUEST_REJECTED`
++ if the connection is not possible (internal error, too many active connections, etc.), *responder* sends `REQUEST_DROPPED`
 + if the secrets are valid and the connection is possible, *responder* sends `REQUEST_ACCEPTED`
 + if the request has been accepted, each peer proceeds to create its end of the network
-+ when the connection has been established, each peer sends a `HELLO` message containing its IP address
++ when the connection has been established, each peer sends a `HELLO` message containing its IP address; from then on, they can use the connection to exchange data
 + when a peer closes the connection, it sends a `BYE` message
 
 ### After the connection is established
 
 The standard option for P2P communication once the connection is established would be WebRTC.
 
-However, NAN uses scoped IPv6 addresses that are not currently supported by WebRTC. More work will be needed on this area. Related bugs:
+However, NAN uses link-local IPv6 addresses that are not currently supported by WebRTC. More work will be needed on this area.
+
+Related bugs:
 
 + [Chromium Issue 9978: Ignoring link-local IPv6 addresses makes WebRTC fail on mobile devices linked via WiFi Aware](https://bugs.chromium.org/p/webrtc/issues/detail?id=9978)
 + [Mozilla Bug 1445771: Loopback and link-local addresses](https://bugzilla.mozilla.org/show_bug.cgi?id=1445771)
