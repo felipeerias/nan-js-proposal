@@ -67,9 +67,9 @@ The videos below show an example application that lets users carry out collabora
 
 NAN connections enable fast and convenient transfer of files between nearby devices, without the data having to be uploaded and downloaded to/from a remote server. The examples below use NFC to exchange the device's information, which is then used to establish the connection and transfer the files.
 
-* [VIDEO 1 - prototype transfering between two devices (280 MB)](https://darker.ink/static/media/uploads/08_awarebeam_1.mp4)
-* [VIDEO 2 - prototype transfering from one device to another two (172 MB)](https://darker.ink/static/media/uploads/09_awarebeam_2.mp4)
-* [VIDEO 3 - prototype transfering multiple files](https://darker.ink/static/media/uploads/10_awarebeam_3.mp4)
+* [VIDEO 1 - prototype transfering 280 MB between two devices](https://darker.ink/static/media/uploads/08_awarebeam_1.mp4)
+* [VIDEO 2 - prototype transfering 172 MB from one device to another two](https://darker.ink/static/media/uploads/09_awarebeam_2.mp4)
+* [VIDEO 3 - prototype transfering several files at the same time](https://darker.ink/static/media/uploads/10_awarebeam_3.mp4)
 
 ### Local gaming
 
@@ -289,10 +289,8 @@ Connection requests are only possible between peers that have discovered each ot
 
 The standard option for P2P communication once the connection is established would be WebRTC.
 
-However, NAN uses scoped IPv6 addresses that are not currently supported by WebRTC. More work will be needed on this area. Relevant bugs and discussion:
+However, NAN uses scoped IPv6 addresses that are not currently supported by WebRTC. More work will be needed on this area. Related bugs:
 
-+ https://bugs.chromium.org/p/webrtc/issues/detail?id=9978
-+ https://bugzilla.mozilla.org/show_bug.cgi?id=1445771
-+ https://groups.google.com/forum/#!topic/discuss-webrtc/FlKQafa1Kfo
-
++ [Chromium Issue 9978: Ignoring link-local IPv6 addresses makes WebRTC fail on mobile devices linked via WiFi Aware](https://bugs.chromium.org/p/webrtc/issues/detail?id=9978)
++ [Mozilla Bug 1445771: Loopback and link-local addresses](https://bugzilla.mozilla.org/show_bug.cgi?id=1445771)
 
