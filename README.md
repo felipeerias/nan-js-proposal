@@ -145,7 +145,7 @@ The read-only property `Navigator.nan` returns an object of type `NanManager` th
 
 The user of the API must being by invoking the `attach()` method which, if successful, will return the identifier for the current session.
 
-```
+```javascript
 navigator.nan.attach()
   .then((sessionId) => {
     // NAN started
@@ -160,12 +160,12 @@ Invoking the `attach()` method may trigger a permission request dialog, display 
 
 Once NAN is started and we have received the `sessionId` of the other user(s), we can subscribe to discovery events:
 
-```
+```javascript
 navigator.nan.ondiscovered = function(peer) {
   // called when a peer has been discovered
 });
 
-navigator.nan.subscribeToPeer(peerId);
+navigator.nan.subscribe(peerId);
 ```
 
 A discovery event will return a `NanPeer` object encapsulating the information and state of a single peer.
@@ -174,7 +174,7 @@ The user can also get a list of the known peers by calling `NanManager.getPeers(
 
 The `NanPeer` object can be used to request a connection:
 
-```
+```javascript
 navigator.nan.onconnected = function(peer) {
   // called when a connection has been established
 });
@@ -194,7 +194,7 @@ peer.requestConnection().then(
 
 Upon receiving a connection request, the other peer will be prompted to accept or reject it:
 
-```
+```javascript
 navigator.nan.onconnectionrequest = function(peer) {
   // call acceptConnectionRequest() here with isAccepted=true to
   // accept the connection, or with isAccepted=false to reject it
@@ -205,18 +205,24 @@ navigator.nan.onconnectionrequest = function(peer) {
 
 After a connection has been established, `peer.baseUrl` will contain the base address of the peer, which may then be used to exchange data (the exact mechanism is outside the scope of this proposal).
 
+### Sequence Diagram
+
+![Conceptual sequence diagram](img/conceptual_sequence_diagram.png)
+
 ### Draft API spec
 
 Interface `NanManager`:
 
-+ `start()`: attach to the NAN service; returns a Promise that, when succesfully resolved, provides the `peerId` for this user session
-+ `stop()`: ends the session and detaches the user from the NAN service (after calling this method, `peerId` will no longer be valid)
-+ `subscribeToPeer(peerId)`: adds the peer identified by the given ID to the list of subscribed peers
-+ `unsubscribeFromPeer(peerId)`: removes the peer
++ `attach()`: attach to the NAN service; returns a Promise that, when succesfully resolved, provides the `peerId` for this user session
++ `detach()`: ends the session and detaches the user from the NAN service (after calling this method, `peerId` will no longer be valid)
++ `subscribe(peerId)`: adds the peer identified by the given ID to the list of subscribed peers; returns the new `NanPeer` object
++ `unsubscribe(peerId)`: removes the peer
 + `getPeers()`: returns the collection of subscribed peers
 + `onPeerStateChanged(peer)`: handler for when a peer's state has been updated
 + `onConnectionRequest(peer)`: handler for when a peer has requested a connection
 + `acceptConnectionRequest(peer, isAccepted)`: indicates that a pending connection request should be accepted
++ `onConnected(peer)`
++ `onDisconnected(peer)`
 
 Interface `PeerId`:
 
