@@ -139,15 +139,6 @@ While this proposal relies on the exchange of these session IDs as a preconditio
 
 Another aspect that is not currently covered by this proposal is peer authentication.
 
-### After the connection is established
-
-The standard option for P2P communication once the connection is established would be WebRTC. However, NAN uses link-local IPv6 addresses that are not currently supported by WebRTC. More work will be needed on this area.
-
-Related bugs:
-
-+ [Mozilla Bug 1445771: Loopback and link-local addresses](https://bugzilla.mozilla.org/show_bug.cgi?id=1445771)
-+ [Chromium Issue 9978: Ignoring link-local IPv6 addresses makes WebRTC fail on mobile devices linked via WiFi Aware](https://bugs.chromium.org/p/webrtc/issues/detail?id=9978)
-
 ### API Overview
 
 The read-only property `Navigator.nan` returns an object of type `NanManager` that is the main contact point with the NAN subsystem.
@@ -247,6 +238,15 @@ Interface `NanPeer`:
 + `acceptConnectionRequest(isAccepted)`: indicates that a pending connection request should be accepted
 + `closeConnection()`
 + `unsuscribe()`: remove this peer from the list of subscribed peers
+
+### After the connection is established
+
+The standard option for P2P communication once the connection is established would be WebRTC. However, NAN uses link-local IPv6 addresses that are not currently supported by WebRTC. More work will be needed on this area.
+
+Related bugs:
+
++ [Mozilla Bug 1445771: Loopback and link-local addresses](https://bugzilla.mozilla.org/show_bug.cgi?id=1445771)
++ [Chromium Issue 9978: Ignoring link-local IPv6 addresses makes WebRTC fail on mobile devices linked via WiFi Aware](https://bugs.chromium.org/p/webrtc/issues/detail?id=9978)
 
 ## Implementation notes
 
