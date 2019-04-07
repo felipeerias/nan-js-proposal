@@ -4,26 +4,26 @@
 
 ##### Table of Contents  
 
-* [Summary](#summary)
-* [Introduction to Neighbour Awareness Networking](#introduction-to-neighbour-awareness-networking)
-* [Use cases](#use-cases)
-* [Privacy and security](#privacy-and-security)
-* [Proposed solution](#proposed-solution)
-* [Implementation notes](#implementation-notes)
+1. [Summary](#summary)
+2. [Introduction to Neighbour Awareness Networking](#introduction-to-neighbour-awareness-networking)
+3. [Use cases](#use-cases)
+4. [Privacy and security](#privacy-and-security)
+5. [Proposed solution](#proposed-solution)
+6. [Implementation notes](#implementation-notes)
 
 ## Summary
 
-[Neighbour Awareness Networking](#introduction-to-neighbour-awareness-networking) ("NAN" from here on), also known as Wi-Fi Aware, is an official Wi-Fi specification that enables mobile devices to discover and connect directly to each other without requiring any other type of connectivity between them.
+Neighbour Awareness Networking ("NAN" from here on) (see [section 2](#introduction-to-neighbour-awareness-networking)), also known as Wi-Fi Aware, is an official Wi-Fi specification that enables mobile devices to discover and connect directly to each other without requiring any other type of connectivity between them.
 
-Making this functionality available to websites would enable them to create fast and convenient connections between users who are physically close, opening up [new ways of approaching the creation of Web solutions](#use-cases).
+Making this functionality available to websites would enable them to create fast and convenient connections between users who are physically close, opening up new ways of approaching the creation of Web solutions (see [section 3](#use-cases)).
 
-However, this can not be done lightly: a careless use of this technology would pose severe [threats to privacy and security](#privacy-and-security).
+However, this can not be done lightly: a careless use of this technology would pose severe threats to privacy and security (see [section 4](#privacy-and-security)).
 
-This document presents a draft proposal for [a JavaScript API for NAN](#proposed-solution) that balances usefulness and user safety. It achieves this by changing the conceptual model from that of the underlaying network technology: instead of discovering and being discovered by every other node nearby, Web applications would register their interest in individual user sessions and will only be able to discover and connect to those.
+This document presents a draft proposal for a JavaScript API for NAN (see [section 5](#proposed-solution) that balances usefulness and user safety. It achieves this by changing the conceptual model from that of the underlaying network technology: instead of discovering and being discovered by every other node nearby, Web applications would register their interest in individual user sessions and will only be able to discover and connect to those.
 
 The goal of this Web API is to make it easy to discover and connect to people who have allowed you to do so, and only to them.
 
-This document also discusses [an example protocol at the network level](#implementation-notes): this protocol is intentionally kept simple, as its main purpose is to show the feasibility of implementing the proposed Web API.
+This document also discusses an example protocol at the network level (see [section 6](#implementation-notes)): this protocol is intentionally kept simple, as its main purpose is to show the feasibility of implementing the proposed Web API.
 
 ## Introduction to Neighbour Awareness Networking
 
@@ -143,7 +143,7 @@ Another aspect that is not currently covered by this proposal is peer authentica
 
 The read-only property `Navigator.nan` returns an object of type `NanManager` that is the main contact point with the NAN subsystem.
 
-The user of the API must being by invoking the `attach()` method which, if successful, will return the identifier for the current session.
+The user of the API must being by invoking the `attach()` method which, if successful, will return the `sessionId` for the current session. Invoking the `attach()` method may trigger a permission request dialog, display an ongoing notification, etc.
 
 ```javascript
 navigator.nan.attach()
@@ -156,30 +156,26 @@ navigator.nan.attach()
   });
 ```
 
-Invoking the `attach()` method may trigger a permission request dialog, display an ongoing notification, etc.
+In order to discover and connect to each other, peers must exchange their `sessionId`. This proposal doesn't mandate a particular mechanism to do so.
 
-Once NAN is started and we have received the `sessionId` of the other user(s), we can subscribe to discovery events:
+Once the user has received the `sessionId` of the other peer, it can invoke `NanManager.subscribe()` to obtain a `NanPeer` object representing the peer and providing updates on its state. The user can also get a list of the subscribed peers by calling `NanManager.getPeers()`.
 
 ```javascript
-navigator.nan.ondiscovered = function(peer) {
-  // called when a peer has been discovered
-});
+peer = navigator.nan.subscribe(peerId);
 
-navigator.nan.subscribe(peerId);
+peer.onStateChanged = function(state) {
+  // called when the peer's state changes
+});
 ```
 
-A discovery event will return a `NanPeer` object encapsulating the information and state of a single peer.
-
-The user can also get a list of the known peers by calling `NanManager.getPeers()`.
-
-The `NanPeer` object can be used to request a connection:
+The `NanPeer` object may be used to request a connection to that peer:
 
 ```javascript
-navigator.nan.onconnected = function(peer) {
+navigator.nan.onConnected = function(peer) {
   // called when a connection has been established
 });
 
-navigator.nan.ondisconnected = function(peer) {
+navigator.nan.onDisconnected = function(peer) {
   // called when a connection has been interrupted
 });
 
@@ -195,15 +191,21 @@ peer.requestConnection().then(
 Upon receiving a connection request, the other peer will be prompted to accept or reject it:
 
 ```javascript
-navigator.nan.onconnectionrequest = function(peer) {
+peer.onConnectionRequest = function() {
   // call acceptConnectionRequest() here with isAccepted=true to
   // accept the connection, or with isAccepted=false to reject it
 
-  navigator.nan.acceptConnectionRequest(peer, isAccepted)
+  peer.acceptConnectionRequest(isAccepted)
 });
 ```
 
-After a connection has been established, `peer.baseUrl` will contain the base address of the peer, which may then be used to exchange data (the exact mechanism is outside the scope of this proposal).
+When the connection is established, both peers will receive the event `NanManager.onConnected()`.
+
+At that point, `peer.baseUrl` will contain the base address of the peer, which may then be used to exchange data (e.g. using WebRTC, although the exact mechanism is outside the scope of this proposal).
+
+If the user wishes to end the connection, it may do so by invoking `peer.closeConnection()`. When the connection ends, both peers will receive the event `NanManager.onDisconnected()`.
+
+Finally, the user may call `NanManager.detach()` to stop announcements, close all ongoing connections, and detach from the NAN subsystem.
 
 ### Sequence Diagram
 
@@ -218,9 +220,6 @@ Interface `NanManager`:
 + `subscribe(peerId)`: adds the peer identified by the given ID to the list of subscribed peers; returns the new `NanPeer` object
 + `unsubscribe(peerId)`: removes the peer
 + `getPeers()`: returns the collection of subscribed peers
-+ `onPeerStateChanged(peer)`: handler for when a peer's state has been updated
-+ `onConnectionRequest(peer)`: handler for when a peer has requested a connection
-+ `acceptConnectionRequest(peer, isAccepted)`: indicates that a pending connection request should be accepted
 + `onConnected(peer)`
 + `onDisconnected(peer)`
 
@@ -232,9 +231,11 @@ Interface `PeerId`:
 Interface `NanPeer`:
 
 + `state`: read-only property containing the peer's current state (gone, discovered, connecting, connected…)
-+ `baseUrl
-+ `onStateChanged()`: handler for when the state changes
-+ `requestConnection()`
++ `baseUrl`: read-only property containing the peer's address, if a connection has been established
++ `onStateChanged()`: handler for when the peer's state changes
++ `requestConnection()`: requests a connection to the peer
++ `onConnectionRequest()`: handler for when a peer requests a connection
++ `acceptConnectionRequest(isAccepted)`: indicates that a pending connection request should be accepted
 + `closeConnection()`
 + `unsuscribe()`: remove this peer from the list of subscribed peers
 
