@@ -19,7 +19,7 @@ Making this functionality available to websites would enable them to create fast
 
 However, this can not be done lightly: a careless use of this technology would pose severe threats to privacy and security (see [section 4](#privacy-and-security)).
 
-This document presents a draft proposal for a JavaScript API for NAN (see [section 5](#proposed-solution)) that balances usefulness and user safety. It achieves this by changing the conceptual model from that of the underlaying network technology: instead of discovering and being discovered by every other node nearby, Web applications would register their interest in individual user sessions and will only be able to discover and connect to those.
+This document presents a draft proposal for a JavaScript API for NAN (see [section 5](#proposed-solution)) that balances usefulness and user safety. It achieves this by changing the conceptual model from that of the underlaying network technology: instead of discovering and being discovered by every other node nearby, Web applications would register their interest in individual user sessions and would only be able to discover and connect to those.
 
 The goal of this Web API is to make it easy to discover and connect to people who have allowed you to do so, and only to them.
 
@@ -138,6 +138,15 @@ While this proposal relies on the exchange of these session IDs as a preconditio
  - via a physical tap of the devices, using NFC
 
 Another aspect that is not currently covered by this proposal is peer authentication.
+
+### After the connection is established
+
+The standard option for P2P communication once the connection is established would be WebRTC. However, NAN uses link-local IPv6 addresses that are not currently supported by WebRTC. More work will be needed on this area.
+
+Related bugs:
+
++ [Mozilla Bug 1445771: Loopback and link-local addresses](https://bugzilla.mozilla.org/show_bug.cgi?id=1445771)
++ [Chromium Issue 9978: Ignoring link-local IPv6 addresses makes WebRTC fail on mobile devices linked via WiFi Aware](https://bugs.chromium.org/p/webrtc/issues/detail?id=9978)
 
 ### API Overview
 
@@ -281,7 +290,7 @@ The implementation must consider two scenarios:
 + *symmetric*: both peers have each other's `sessionId`
 + *asymmetric*: following a one-way exchange of `sessionId` from one peer to another, e.g. via NFC
 
-Connection requests are only possible between peers that have discovered each other. They follow this sequence:
+Connection requests are only possible between devices that have discovered each other. They follow this sequence:
 
 + *initiator* sends a `REQUEST` message that includes the `sessionId.secret` of both peers
 + *responder* validates the received secrets
@@ -291,15 +300,4 @@ Connection requests are only possible between peers that have discovered each ot
 + if the request has been accepted, each peer proceeds to create its end of the network
 + when the connection has been established, each peer sends a `HELLO` message containing its IP address; from then on, they can use the connection to exchange data
 + when a peer closes the connection, it sends a `BYE` message
-
-### After the connection is established
-
-The standard option for P2P communication once the connection is established would be WebRTC.
-
-However, NAN uses link-local IPv6 addresses that are not currently supported by WebRTC. More work will be needed on this area.
-
-Related bugs:
-
-+ [Chromium Issue 9978: Ignoring link-local IPv6 addresses makes WebRTC fail on mobile devices linked via WiFi Aware](https://bugs.chromium.org/p/webrtc/issues/detail?id=9978)
-+ [Mozilla Bug 1445771: Loopback and link-local addresses](https://bugzilla.mozilla.org/show_bug.cgi?id=1445771)
 
