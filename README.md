@@ -53,11 +53,11 @@ Note that this list does not attempt to be exhaustive and that the prototypes sh
 
 ### Fluid same-place collaboration
 
-NAN makes possible the flexible interconnection of digital devices, enabling fluid real-time collaboration with high bandwidth and low latency while improving privacy and security, as the data remains local to the users' devices.
+NAN makes possible the flexible interconnection of devices, enabling fluid collaboration with high bandwidth while improving privacy and security, as the data remains local to the users' devices.
 
 NAN can be used to reduce the amount of data that is exchanged over the Internet, optimizing bandwidth usage and providing more functionality when devices are offline.
 
-The videos below show an example application that lets users carry out collaborative presentations without relying on existing network infrastructure.
+The videos below show a prototype app that lets users share and annotate documents without relying on existing network infrastructure.
 
 * [VIDEO 1 - prototype using NFC to join a presentation, with live drawing](https://darker.ink/static/media/uploads/05_meshpresenter_1.mp4)
 * [VIDEO 2 - prototype sharing images between participants](https://darker.ink/static/media/uploads/06_meshpresenter_2.mp4)
@@ -73,7 +73,7 @@ NAN connections enable fast and convenient transfer of files between nearby devi
 
 ### Local gaming
 
-NAN connections may be used for local gaming in situations where Internet access is unavailable or restricted. In the example videos below, one device acts as the game server through two 1-to-1 connections with the others.
+NAN connections may be used for local gaming in situations where Internet access is unavailable or restricted. In the example videos below, one device acts as the game server through two 1-to-1 connections with the other two.
 
 * [VIDEO 1 - prototype playing OpenArena](https://darker.ink/static/media/uploads/02_openarena_1.mp4)
 * [VIDEO 2 - prototype playing OpenArena](https://darker.ink/static/media/uploads/03_openarena_2.mp4)
@@ -104,6 +104,7 @@ NAN may be used to share information between a user's mobile and PC when they ar
 * [“Emergent IoT configurations for same-place collaboration”](https://darker.ink/static/media/TP1_IDM_Felipe_Erias_FINAL.pdf) (PDF)
 * [RFC 7478: Web Real-Time Communication Use Cases and Requirements](https://tools.ietf.org/html/rfc7478)
 * [WebRTC Next Version Use Cases](https://www.w3.org/TR/webrtc-nv-use-cases/) (working draft)
+* [Wi-Fi Alliance](https://www.wi-fi.org/discover-wi-fi/wi-fi-aware)
 
 ## Privacy and security
 
