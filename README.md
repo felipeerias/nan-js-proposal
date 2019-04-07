@@ -19,7 +19,7 @@ Making this functionality available to websites would enable them to create fast
 
 However, this can not be done lightly: a careless use of this technology would pose severe threats to privacy and security (see [section 4](#privacy-and-security)).
 
-This document presents a draft proposal for a JavaScript API for NAN (see [section 5](#proposed-solution) that balances usefulness and user safety. It achieves this by changing the conceptual model from that of the underlaying network technology: instead of discovering and being discovered by every other node nearby, Web applications would register their interest in individual user sessions and will only be able to discover and connect to those.
+This document presents a draft proposal for a JavaScript API for NAN (see [section 5](#proposed-solution)) that balances usefulness and user safety. It achieves this by changing the conceptual model from that of the underlaying network technology: instead of discovering and being discovered by every other node nearby, Web applications would register their interest in individual user sessions and will only be able to discover and connect to those.
 
 The goal of this Web API is to make it easy to discover and connect to people who have allowed you to do so, and only to them.
 
