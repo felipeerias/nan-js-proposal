@@ -60,29 +60,29 @@ NAN can be used to reduce the amount of data that is exchanged over the Internet
 The videos below show a prototype app that lets users share and annotate documents without relying on existing network infrastructure.
 
 * [VIDEO 1 - prototype using NFC to join a presentation, with live drawing](video/05_meshpresenter_1.mp4?raw=true)
-* [VIDEO 2 - prototype sharing images between participants](https://darker.ink/static/media/uploads/06_meshpresenter_2.mp4)
-* [VIDEO 3 - prototype carrying out a poll](https://darker.ink/static/media/uploads/07_meshpresenter_3.mp4)
+* [VIDEO 2 - prototype sharing images between participants](video/06_meshpresenter_2.mp4?raw=true)
+* [VIDEO 3 - prototype carrying out a poll](video/07_meshpresenter_3.mp4?raw=true)
 
 ### Fast transfer of files
 
 NAN connections enable fast and convenient transfer of files between nearby devices, without the data having to be uploaded and downloaded to/from a remote server. The examples below use NFC to exchange the device's information, which is then used to establish the connection and transfer the files.
 
-* [VIDEO 1 - prototype transfering 280 MB between two devices](https://darker.ink/static/media/uploads/08_awarebeam_1.mp4)
-* [VIDEO 2 - prototype transfering 172 MB from one device to another two](https://darker.ink/static/media/uploads/09_awarebeam_2.mp4)
-* [VIDEO 3 - prototype transfering several files at the same time](https://darker.ink/static/media/uploads/10_awarebeam_3.mp4)
+* [VIDEO 1 - prototype transfering 280 MB between two devices](video/08_awarebeam_1.mp4?raw=true)
+* [VIDEO 2 - prototype transfering 172 MB from one device to another two](video/09_awarebeam_2.mp4?raw=true)
+* [VIDEO 3 - prototype transfering several files at the same time](video/10_awarebeam_3.mp4?raw=true)
 
 ### Local gaming
 
 NAN connections may be used for local gaming in situations where Internet access is unavailable or restricted. In the example videos below, one device acts as the game server through two 1-to-1 connections with the other two.
 
-* [VIDEO 1 - prototype playing OpenArena](https://darker.ink/static/media/uploads/02_openarena_1.mp4)
-* [VIDEO 2 - prototype playing OpenArena](https://darker.ink/static/media/uploads/03_openarena_2.mp4)
+* [VIDEO 1 - prototype playing OpenArena](video/02_openarena_1.mp4?raw=true)
+* [VIDEO 2 - prototype playing OpenArena](video/03_openarena_2.mp4?raw=true)
 
 ### Media streaming
 
 NAN connections enable the streaming of HD media directly between nearby devices. Beyond the most obvious use cases (videocalls, etc.), the video below is a design exploration: a camera application that receives a stream of what your friends' cameras around you are pointing at, giving you different points of view of an event.
 
-* [VIDEO - collaborative camera](https://darker.ink/static/media/uploads/collaborativecameratest.mp4)
+* [VIDEO - collaborative camera](video/collaborativecameratest.mp4?raw=true)
 
 ### Proximity detection
 
