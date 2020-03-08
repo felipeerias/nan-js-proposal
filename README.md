@@ -59,7 +59,7 @@ NAN can be used to reduce the amount of data that is exchanged over the Internet
 
 The videos below show a prototype app that lets users share and annotate documents without relying on existing network infrastructure.
 
-* [VIDEO 1 - prototype using NFC to join a presentation, with live drawing](https://darker.ink/static/media/uploads/05_meshpresenter_1.mp4)
+* [VIDEO 1 - prototype using NFC to join a presentation, with live drawing](video/05_meshpresenter_1.mp4)
 * [VIDEO 2 - prototype sharing images between participants](https://darker.ink/static/media/uploads/06_meshpresenter_2.mp4)
 * [VIDEO 3 - prototype carrying out a poll](https://darker.ink/static/media/uploads/07_meshpresenter_3.mp4)
 
