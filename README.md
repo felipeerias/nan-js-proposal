@@ -59,30 +59,30 @@ NAN can be used to reduce the amount of data that is exchanged over the Internet
 
 The videos below show a prototype app that lets users share and annotate documents without relying on existing network infrastructure.
 
-* [VIDEO 1 - prototype using NFC to join a presentation, with live drawing](video/05_meshpresenter_1.mp4?raw=true)
-* [VIDEO 2 - prototype sharing images between participants](video/06_meshpresenter_2.mp4?raw=true)
-* [VIDEO 3 - prototype carrying out a poll](video/07_meshpresenter_3.mp4?raw=true)
+* [VIDEO 1 - prototype using NFC to join a presentation, with live drawing](https://vimeo.com/418946453) ([Download](video/05_meshpresenter_1.mp4?raw=true))
+* [VIDEO 2 - prototype sharing images between participants](https://vimeo.com/418946498) ([Download](video/06_meshpresenter_2.mp4?raw=true))
+* [VIDEO 3 - prototype carrying out a poll](https://vimeo.com/418946615) ([Download](video/07_meshpresenter_3.mp4?raw=true))
 
 ### Fast transfer of files
 
 NAN connections enable fast and convenient transfer of files between nearby devices, without the data having to be uploaded and downloaded to/from a remote server. The examples below use NFC to exchange the device's information, which is then used to establish the connection and transfer the files.
 
-* [VIDEO 1 - prototype transfering 280 MB between two devices](video/08_awarebeam_1.mp4?raw=true)
-* [VIDEO 2 - prototype transfering 172 MB from one device to another two](video/09_awarebeam_2.mp4?raw=true)
-* [VIDEO 3 - prototype transfering several files at the same time](video/10_awarebeam_3.mp4?raw=true)
+* [VIDEO 1 - prototype transfering 280 MB between two devices](https://vimeo.com/418946837) ([Download](video/08_awarebeam_1.mp4?raw=true))
+* [VIDEO 2 - prototype transfering 172 MB from one device to another two](https://vimeo.com/418946910) ([Download](video/09_awarebeam_2.mp4?raw=true))
+* [VIDEO 3 - prototype transfering several files at the same time](https://vimeo.com/418946952) ([Download](video/10_awarebeam_3.mp4?raw=true))
 
 ### Local gaming
 
 NAN connections may be used for local gaming in situations where Internet access is unavailable or restricted. In the example videos below, one device acts as the game server through two 1-to-1 connections with the other two.
 
-* [VIDEO 1 - prototype playing OpenArena](video/02_openarena_1.mp4?raw=true)
-* [VIDEO 2 - prototype playing OpenArena](video/03_openarena_2.mp4?raw=true)
+* [VIDEO 1 - prototype playing OpenArena](https://vimeo.com/418946270) ([Download](video/02_openarena_1.mp4?raw=true))
+* [VIDEO 2 - prototype playing OpenArena](https://vimeo.com/418946396) ([Download](video/03_openarena_2.mp4?raw=true))
 
 ### Media streaming
 
 NAN connections enable the streaming of HD media directly between nearby devices. Beyond the most obvious use cases (videocalls, etc.), the video below is a design exploration: a camera application that receives a stream of what your friends' cameras around you are pointing at, giving you different points of view of an event.
 
-* [VIDEO - collaborative camera](video/collaborativecameratest.mp4?raw=true)
+* [VIDEO - collaborative camera](https://vimeo.com/418947078) ([Download](video/collaborativecameratest.mp4?raw=true))
 
 ### Proximity detection
 
@@ -99,9 +99,9 @@ NAN may be used to share information between a user's mobile and PC when they ar
 ### Read more
 
 * [“Mobile design with device-to-device networks”](https://darker.ink/blog/mobile-design-with-device-to-device-networks/) (blog)
-* [“Mobile design with device-to-device networks”](https://fosdem.org/2019/schedule/event/device_to_device_networks/) (FOSDEM)
+* [“Mobile design with device-to-device networks”](https://fosdem.org/2019/schedule/event/device_to_device_networks/) (FOSDEM talk)
 * [“P2P presentations”](https://darker.ink/blog/p2p-presentations/) (blog)
-* [“Emergent IoT configurations for same-place collaboration”](https://darker.ink/static/media/TP1_IDM_Felipe_Erias_FINAL.pdf) (PDF)
+* [“Emergent IoT configurations for same-place collaboration”](http://muep.mau.se/handle/2043/19439) ([alternative link](http://urn.kb.se/resolve?urn=urn:nbn:se:mau:diva-21437)) (PDF)
 * [RFC 7478: Web Real-Time Communication Use Cases and Requirements](https://tools.ietf.org/html/rfc7478)
 * [WebRTC Next Version Use Cases](https://www.w3.org/TR/webrtc-nv-use-cases/) (working draft)
 * [Wi-Fi Alliance](https://www.wi-fi.org/discover-wi-fi/wi-fi-aware)
